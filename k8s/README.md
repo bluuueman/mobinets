@@ -1,2 +1,2 @@
 # Kubernetes
-进行k8s配置
+k8s相关配置
