@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"fmt"
@@ -8,15 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-func main() {
-	router := gin.Default()
-	// 给表单限制上传大小 (默认 32 MiB)
-	// router.MaxMultipartMemory = 8 << 20  // 8 MiB
-	router.POST("/upload", FileUpload)
-	router.POST("/execcmd", ExecCommand)
-	router.Run(":8080")
-}
 
 //文件上传
 func FileUpload(c *gin.Context) {
@@ -29,7 +20,7 @@ func FileUpload(c *gin.Context) {
 		return
 	}
 	log.Println(file.Filename)
-	dir := "./tmp/"
+	dir := "tmp/"
 	dst := fmt.Sprintf(dir + file.Filename)
 	c.SaveUploadedFile(file, dst)
 	c.JSON(http.StatusOK, gin.H{
@@ -49,7 +40,7 @@ func ExecCommand(c *gin.Context) {
 	if bindErr != nil {
 		log.Println("BindJSON error! ", bindErr)
 	}
-	target := "./tmp/writefile.txt"
+	target := "tmp/writefile.txt"
 	cmd := exec.Command("cmd", "/C", "echo"+" "+jsondata.Message+">"+target)
 	cmdRunErr := cmd.Run()
 	if cmdRunErr != nil {
