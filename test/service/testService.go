@@ -41,7 +41,7 @@ func ExecCommand(c *gin.Context) {
 		log.Println("BindJSON error! ", bindErr)
 	}
 	target := "tmp/writefile.txt"
-	cmd := exec.Command("cmd", "/C", "echo"+" "+jsondata.Message+">"+target)
+	cmd := exec.Command("/bin/bash", "-c", "echo"+" "+jsondata.Message+" > "+target)
 	cmdRunErr := cmd.Run()
 	if cmdRunErr != nil {
 		log.Println("ERROR: Command exec failed. ", cmdRunErr)
