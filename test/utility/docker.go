@@ -1,35 +1,39 @@
 package utility
 
 import (
-	"os"
+	"bytes"
 	"os/exec"
 )
-logDir := "test/tmp/dockerLog.txt"
 
-func dockerPull(image string) *exec.Command{
-	
+const logDir string = "./log/dockerLog/log.txt"
+
+func DockerPull(image string, output *bytes.Buffer) *exec.Cmd {
+
 	cmd := exec.Command("/bin/bash", "-c", "docker pull "+image)
-	cmdStartErr := cmd.Start()
-	if cmdStartErr != nil{
-		log.Println(cmdStartErr)
+	cmd.Stdout = output
+	err := cmd.Start()
+	if IsErr(err, "Command Start Failed!") {
 		return nil
 	}
 	return cmd
 }
 
-func dockerPullResult(cmd *exec.Cmd) int{
-	cmdWaitErr := cmd.Wait()
-	if cmdWaitErr != nil{
-		log.Println(cmdWaitErr)
-
-		return 0
+func DockerPullResult(cmd *exec.Cmd) bool {
+	err := cmd.Wait()
+	if IsErr(err, "Command Wait Failed!") {
+		return false
 	}
-	writeLog()
-	return 1
-	
+	return true
 }
 
-func dockerImages() int{
+func DockerImages(output *bytes.Buffer) bool {
 	cmd := exec.Command("/bin/bash", "-c", "docker images")
+	cmd.Stdout = output
+	err := cmd.Run()
+	if !IsErr(err, "Command Run Failed!") {
+		WriteLog(logDir, "CMD: docker images\n"+output.String())
+		return true
+	}
+	return false
 
 }

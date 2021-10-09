@@ -1,0 +1,7 @@
+#this is docker log
+
+2021/10/09 02:21:14
+CMD: docker images
+REPOSITORY    TAG       IMAGE ID       CREATED       SIZE
+hello-world   latest    feb5d9fea6a5   2 weeks ago   13.3kB
+

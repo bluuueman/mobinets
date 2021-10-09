@@ -10,5 +10,6 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.POST("/upload", service.FileUpload)
 	router.POST("/execcmd", service.ExecCommand)
+	router.GET("/docker/image", service.GetDockerImages)
 	return router
 }

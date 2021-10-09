@@ -1,10 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
+	"test/utility"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,8 +14,7 @@ import (
 //文件上传
 func FileUpload(c *gin.Context) {
 	file, err := c.FormFile("file")
-	if err != nil {
-		log.Println("ERROR: upload file failed. ", err)
+	if utility.IsErr(err, "Upload File Failed!") {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "upload file failed",
 		})
@@ -34,26 +35,40 @@ func ExecCommand(c *gin.Context) {
 	type msg struct {
 		Message string `json:"message"`
 	}
-
 	jsondata := msg{}
 	bindErr := c.BindJSON(&jsondata)
-	if bindErr != nil {
-		log.Println("BindJSON error! ", bindErr)
+	if utility.IsErr(bindErr, "BindJSON Failed!") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Server JSON bind failed",
+		})
+		return
 	}
 	target := "tmp/writefile.txt"
 	cmd := exec.Command("/bin/bash", "-c", "echo"+" "+jsondata.Message+" > "+target)
 	cmdRunErr := cmd.Run()
-	if cmdRunErr != nil {
-		log.Println("ERROR: Command exec failed. ", cmdRunErr)
+	if utility.IsErr(cmdRunErr, "Command Exec Failed!") {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Command exec failed",
 		})
 		return
 	}
-
 	log.Println(jsondata.Message)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Command exec succeed",
 		"target":  target,
+	})
+}
+
+func GetDockerImages(c *gin.Context) {
+	var output bytes.Buffer
+	if utility.DockerImages(&output) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Docker images run succeed",
+			"data":    output.String(),
+		})
+		return
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"message": "Docker images run failed",
 	})
 }
