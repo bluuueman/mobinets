@@ -80,10 +80,40 @@ func StartService(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Command exec succeed",
+		"message": "Service start succeed",
 		"data":    output.String(),
 	})
 	return
+}
+
+func DeleteService(c *gin.Context) {
+	type msg struct {
+		Service   string `json:"service"`
+		Namespace string `json:"namespace"`
+	}
+	jsondata := msg{}
+	bindErr := c.BindJSON(&jsondata)
+	if utility.IsErr(bindErr, "BindJSON Failed!") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Server JSON bind failed",
+		})
+		return
+	}
+	service := jsondata.Service
+	namespace := jsondata.Namespace
+	var output bytes.Buffer
+	if !utility.KubeDeletService(service, namespace, &output) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Delete service failed",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Service delete succeed",
+		"data":    output.String(),
+	})
+	return
+
 }
 
 func GetDockerImages(c *gin.Context) {
