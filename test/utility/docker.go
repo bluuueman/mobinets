@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-const logDir string = "./log/dockerLog/log.txt"
+const dockerLogDir string = "./log/dockerLog/log.txt"
 
 func DockerPull(image string, output *bytes.Buffer) *exec.Cmd {
 
@@ -31,7 +31,7 @@ func DockerImages(output *bytes.Buffer) bool {
 	cmd.Stdout = output
 	err := cmd.Run()
 	if !IsErr(err, "Command Run Failed!") {
-		WriteLog(logDir, "CMD: docker images\n"+output.String())
+		WriteLog(dockerLogDir, "CMD: docker images\n"+output.String())
 		return true
 	}
 	return false

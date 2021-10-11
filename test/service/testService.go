@@ -59,6 +59,33 @@ func ExecCommand(c *gin.Context) {
 	})
 }
 
+func StartService(c *gin.Context) {
+	type msg struct {
+		File string `json:"file"`
+	}
+	jsondata := msg{}
+	bindErr := c.BindJSON(&jsondata)
+	if utility.IsErr(bindErr, "BindJSON Failed!") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Server JSON bind failed",
+		})
+		return
+	}
+	file := jsondata.File
+	var output bytes.Buffer
+	if !utility.KubeApplyYaml(file, &output) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Start service failed",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Command exec succeed",
+		"data":    output.String(),
+	})
+	return
+}
+
 func GetDockerImages(c *gin.Context) {
 	var output bytes.Buffer
 	if utility.DockerImages(&output) {
