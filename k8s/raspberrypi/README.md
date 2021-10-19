@@ -212,3 +212,21 @@ kubectl get secret -n kube-system |grep admin|awk '{print $1}'
 kubectl describe secret dashboard-admin-token-bwgjv -n kube-system|grep '^token'|awk '{print $2}'
 ```
 任意nodeIP:port都可以访问
+## **五、安装metrics**
+### 1.下载yaml配置文件
+```
+wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+### 2.修改配置文件
+在deployment.spec.template.spec.containers.args下添加
+```
+- --kubelet-insecure-tls
+```
+修改deployment.spec.template.spec.containers.image为
+```
+registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:[version]
+```
+### 3.启动metrics-server
+```
+kubectl apply -f components.yaml
+```
