@@ -102,7 +102,7 @@ func DeleteService(c *gin.Context) {
 	service := jsondata.Service
 	namespace := jsondata.Namespace
 	var output bytes.Buffer
-	if !utility.KubeDeletService(service, namespace, &output) {
+	if !utility.KubeDeleteService(service, namespace, &output) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Delete service failed",
 		})
@@ -116,6 +116,35 @@ func DeleteService(c *gin.Context) {
 
 }
 
+func DeleteDeploy(c *gin.Context) {
+	type msg struct {
+		Deploy    string `json:"deploy"`
+		Namespace string `json:"namespace"`
+	}
+	jsondata := msg{}
+	bindErr := c.BindJSON(&jsondata)
+	if utility.IsErr(bindErr, "BindJSON Failed!") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Server JSON bind failed",
+		})
+		return
+	}
+	deploy := jsondata.Deploy
+	namespace := jsondata.Namespace
+	var output bytes.Buffer
+	if !utility.KubeDeleteDeploy(deploy, namespace, &output) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Delete deploy failed",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Deploy delete succeed",
+		"data":    output.String(),
+	})
+	return
+}
+
 func GetDockerImages(c *gin.Context) {
 	var output bytes.Buffer
 	if utility.DockerImages(&output) {
@@ -127,5 +156,31 @@ func GetDockerImages(c *gin.Context) {
 	}
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"message": "Docker images run failed",
+	})
+}
+
+func GetTop(c *gin.Context) {
+	type msg struct {
+		Spec string `json:"spec"`
+	}
+	jsondata := msg{}
+	bindErr := c.BindJSON(&jsondata)
+	if utility.IsErr(bindErr, "BindJSON Failed!") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Server JSON bind failed",
+		})
+		return
+	}
+	spec := jsondata.Spec
+	var output bytes.Buffer
+	if utility.KubeTop(spec, &output) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Kube top run succeed",
+			"data":    output.String(),
+		})
+		return
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"message": "Kube top run failed",
 	})
 }

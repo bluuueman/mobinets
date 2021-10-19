@@ -11,7 +11,9 @@ func SetupRouter() *gin.Engine {
 	router.POST("/upload", service.FileUpload)
 	router.POST("/execcmd", service.ExecCommand)
 	router.GET("/docker/image", service.GetDockerImages)
-	router.POST("/k8s/deleteService", service.DeleteService)
-	router.POST("/k8s/startService", service.StartService)
+	router.DELETE("/k8s/service", service.DeleteService)
+	router.POST("/k8s/service", service.StartService)
+	router.DELETE("/k8s/deploy", service.DeleteDeploy)
+	router.GET("/k8s/top", service.GetTop)
 	return router
 }
