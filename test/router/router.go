@@ -15,5 +15,6 @@ func SetupRouter() *gin.Engine {
 	router.POST("/k8s/service", service.StartService)
 	router.DELETE("/k8s/deploy", service.DeleteDeploy)
 	router.GET("/k8s/top", service.GetTop)
+	router.POST(("/car"), service.CarControl)
 	return router
 }

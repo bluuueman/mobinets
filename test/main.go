@@ -2,6 +2,7 @@ package main
 
 import (
 	"test/router"
+	"test/utility"
 )
 
 //*************************************************************8
@@ -19,6 +20,11 @@ func main() {
 */
 
 func main() {
+	if !utility.InitCarControl() {
+		return
+	}
 	router := router.SetupRouter()
 	_ = router.Run(":8080")
+	utility.CloesCarControl()
+	return
 }

@@ -157,6 +157,7 @@ func GetDockerImages(c *gin.Context) {
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"message": "Docker images run failed",
 	})
+	return
 }
 
 func GetTop(c *gin.Context) {
@@ -183,4 +184,30 @@ func GetTop(c *gin.Context) {
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"message": "Kube top run failed",
 	})
+	return
+}
+
+func CarControl(c *gin.Context) {
+	type msg struct {
+		Control string `json:"control"`
+	}
+	jsondata := msg{}
+	bindErr := c.BindJSON(&jsondata)
+	if utility.IsErr(bindErr, "BindJSON Failed!") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Server JSON bind failed",
+		})
+		return
+	}
+	buf := jsondata.Control
+	if utility.SendCarControl(buf) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Car control send succeed",
+		})
+		return
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"message": "Car control send failed",
+	})
+	return
 }
